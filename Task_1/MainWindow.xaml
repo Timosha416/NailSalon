@@ -1,0 +1,202 @@
+﻿<Window x:Class="Task_1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Task_1"
+        mc:Ignorable="d"
+        Title="Манікюрний салон" Height="450" Width="800">    
+    <Grid>
+        <TabControl>
+            <!--ЗАПИСИ-->
+            <TabItem Header="Записи">
+                <Grid Background="#FFE5E5E5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+                <Calendar x:Name="CalendarOrder" Margin="5" Grid.Row="0" Grid.Column="0"/>
+                <Button x:Name="AddOrder" Content="Add" Grid.Column="0" Margin="10,10,10,140" Grid.Row="1"/>
+                <DataGrid x:Name="gridOrder" AutoGenerateColumns="False" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
+                          ItemsSource="{Binding Path=Orders}" SelectedItem="{Binding Path=SelectedOrder}">
+                    <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
+                            <DataGridTextColumn Header="Employee" Binding="{Binding Employee.Name}" Width="7*" />
+                            <DataGridTextColumn Header="Customer" Binding="{Binding Customer.Name}" Width="3*" />
+                            <DataGridTextColumn Header="Service" Binding="{Binding Service.Name}" Width="2*" />
+                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" Width="2*" />
+                            <DataGridTextColumn Header="Start" Binding="{Binding Start, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                        </DataGrid.Columns>
+                </DataGrid>
+                </Grid>
+            </TabItem>
+            <!--РОЗКЛАД-->
+            <TabItem Header="Розклад">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Calendar x:Name="CalendarSchedule" Margin="5" Grid.Row="0" Grid.Column="0"/>
+                    <Button x:Name="AddSchedule" Content="Set up a schedule" Grid.Column="0" Margin="10,10,10,140" Grid.Row="1"/>
+                    <DataGrid x:Name="gridSchedule" AutoGenerateColumns="False" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
+                              ItemsSource="{Binding Path=Schedules}" SelectedItem="{Binding Path=SelectedSchedule}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Employee" Binding="{Binding Path=Employee.Name}" Width="4*" />
+                            <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="3*" />
+                            <DataGridTextColumn Header="Start" Binding="{Binding Start, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                            <DataGridTextColumn Header="End" Binding="{Binding End, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <!--ПОСЛУГИ-->
+            <TabItem Header="Послуги">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="5*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="AddService" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
+                    <Button x:Name="EditService" Content="Edit" Grid.Row="1" Margin="5" Grid.Column="0"/>
+                    <Button x:Name="DeleteService" Content="Delete" Grid.Row="2" Margin="5" Grid.Column="0"/>
+                    <DataGrid x:Name="gridService" AutoGenerateColumns="False" ItemsSource="{Binding Path=Services}"
+                                          SelectedItem="{Binding Path=SelectedService}" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" Width="642">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="4*" />
+                            <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="2*" />
+                            <DataGridTextColumn Header="Lenght" Binding="{Binding Lenght, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <!--КЛІЄНТИ-->
+            <TabItem Header="Клієнти">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="10*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="AddCustomer" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
+                    <Button x:Name="EditCustomer" Content="Edit" Grid.Row="0" Margin="5" Grid.Column="1"/>
+                    <Button x:Name="DeleteCustomer" Content="Delete" Grid.Row="0" Margin="5" Grid.Column="2"/>
+                    <Label Content="Search:" Grid.Row="0" Margin="5" Grid.Column="3" HorizontalAlignment="Right"/>
+                    <TextBox Text="{Binding Path=SearchCustomer, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Margin="5" Grid.Column="4" Grid.ColumnSpan="2"/>
+                    <DataGrid x:Name="gridCustomer" AutoGenerateColumns="False" ItemsSource="{Binding Path=Customers}"
+                                          SelectedItem="{Binding Path=SelectedCustomer}" HorizontalAlignment="Center" Width="794" Grid.Row="1" Grid.ColumnSpan="6">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="7*" />
+                            <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="3*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Адміністратор">
+                <Grid Background="#FFE5E5E5">
+                    <TabControl>
+                        <!--СПІВРОБІТНИКИ-->
+                        <TabItem Header="Співробітники">
+                            <Grid Background="#FFE5E5E5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="AddEmployee" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
+                                <Button x:Name="EditEmployee" Content="Edit" Grid.Row="1" Margin="5" Grid.Column="0"/>
+                                <Button x:Name="DeleteEmployee" Content="Delete" Grid.Row="2" Margin="5" Grid.Column="0"/>
+                                <DataGrid x:Name="gridEmployee" AutoGenerateColumns="False" ItemsSource="{Binding Path=Employees}"
+                                          SelectedItem="{Binding Path=SelectedEmployee}" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" Width="642">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="7*" />
+                                        <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="3*" />
+                                        <DataGridTextColumn Header="Position" Binding="{Binding Position.Name}" Width="3*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <!--ПОСАДИ-->
+                        <TabItem Header="Посади">
+                            <Grid Background="#FFE5E5E5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="AddPosition" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
+                                <Button x:Name="EditPosition" Content="Edit" Grid.Row="1" Margin="5" Grid.Column="0"/>
+                                <Button x:Name="DeletePosition" Content="Delete" Grid.Row="2" Margin="5" Grid.Column="0"/>                                
+                                <DataGrid x:Name="gridPosition" AutoGenerateColumns="False"
+                                          ItemsSource="{Binding Path=Positions}"
+                                          SelectedItem="{Binding Path=SelectedPosition}"
+                                          HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" Width="642">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="7*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Статистика по клієнтам">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                        <TabItem Header="Статистика по послугам">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                        <TabItem Header="Каса">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
