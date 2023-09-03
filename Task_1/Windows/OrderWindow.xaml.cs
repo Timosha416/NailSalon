@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -32,52 +33,23 @@ namespace Task_1
         public ObservableCollection<CustomerVM> Customers { get; set; }
         public ObservableCollection<ServiceVM> Services { get; set; }
         public OrderVM ModelOrder { get; set; }
+        public DateTime SelectedStart
+        {
+            get
+            {
+                return new DateTime(2000, 1, 1, ModelOrder.Start.Hours, ModelOrder.Start.Minutes, 0); ;
+            }
+            set
+            {
+                ModelOrder.Start = value.TimeOfDay;
+                OnPropertyChanged(nameof(SelectedStart));
+            }
+        }
 
-        public EmployeeVM _selectedEmployee;
-        public EmployeeVM SelectedEmployee
-        {
-            get
-            {
-                return _selectedEmployee;
-            }
-            set
-            {
-                _selectedEmployee = value;
-                ModelOrder.EmployeeId = value.Id;
-                OnPropertyChanged(nameof(SelectedEmployee));
-            }
-        }
-        public CustomerVM _selectedCustomer;
-        public CustomerVM SelectedCustomer
-        {
-            get
-            {
-                return _selectedCustomer;
-            }
-            set
-            {
-                _selectedCustomer = value;
-                ModelOrder.CustomerId = value.Id;
-                OnPropertyChanged(nameof(SelectedCustomer));
-            }
-        }
-        public ServiceVM _selectedService;
-        public ServiceVM SelectedService
-        {
-            get
-            {
-                return _selectedService;
-            }
-            set
-            {
-                _selectedService = value;
-                ModelOrder.ServiceId = value.Id;
-                OnPropertyChanged(nameof(SelectedService));
-            }
-        }
         public OrderWindow()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             DataContext = this;
             Ok.Click += Ok_Click;
             Cancel.Click += Cancel_Click;
@@ -89,6 +61,11 @@ namespace Task_1
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
+            if (ModelOrder.ModelOrder.Employee is null || ModelOrder.ModelOrder.Customer is null || ModelOrder.ModelOrder.Service is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             this.DialogResult = true;
         }
     }

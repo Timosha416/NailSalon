@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LiveCharts;
+using LiveCharts.Wpf;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +9,7 @@ using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,14 +37,12 @@ namespace Task_1
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
-        }
-
+        }        
         NailContext db = new NailContext();
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
-            CalendarSchedule.SelectedDatesChanged += CalendarSchedule_SelectedDatesChanged;
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             AddCustomer.Click += AddCustomer_Click;
             EditCustomer.Click += EditCustomer_Click;
             DeleteCustomer.Click += DeleteCustomer_Click;
@@ -55,9 +56,98 @@ namespace Task_1
             EditPosition.Click += EditPosition_Click;
             DeletePosition.Click += DeletePosition_Click;
             AddOrder.Click += AddOrder_Click;
+            EditOrder.Click += EditOrder_Click;
+            DeleteOrder.Click += DeleteOrder_Click;
             AddSchedule.Click += AddSchedule_Click;
-            
-        }   
+            setPass.Click += SetPass_Click;
+            statsName.SelectionChanged += Stats_SelectionChanged;
+            statsMounthFrom.SelectionChanged += Stats_SelectionChanged;
+            statsMounthTo.SelectionChanged += Stats_SelectionChanged;
+            statsYear.SelectionChanged += Stats_SelectionChanged;
+            chartYear.SelectionChanged += ChartYear_SelectionChanged;
+            checkPass.Click += CheckPass_Click;
+            tControl.SelectionChanged += TControl_SelectionChanged;
+
+            DataContext = this;
+            statsMounthFrom.ItemsSource = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            statsMounthTo.ItemsSource = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            chartYear.ItemsSource = new List<int> { 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030 };
+            statsYear.ItemsSource = new List<int> { 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030 };
+            statsName.SelectedIndex = 0;
+            statsMounthFrom.SelectedIndex = DateTime.Now.Month - 1;
+            statsMounthTo.SelectedIndex = DateTime.Now.Month - 1;
+            statsYear.SelectedIndex = 3;
+            chartYear.SelectedIndex = 3;
+        }
+
+        private void CheckPass_Click(object sender, RoutedEventArgs e)
+        {
+            if (checkPassText.Password.ToString() == db.Passwords.First().Pass)
+            {
+                MessageBox.Show("Вхід успішний!", "Повідомлення", MessageBoxButton.OK);
+                tControl.SelectedIndex = 5;
+                pass.Visibility = Visibility.Collapsed;
+                admin.Visibility = Visibility.Visible;       
+            }
+            else
+                MessageBox.Show("Некоректний пароль!", "Помилка", MessageBoxButton.OK);
+        }
+
+        private void TControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (!e.AddedItems.Contains(admin))
+            {
+                //PasswordWindow passwordWindow = new PasswordWindow();
+                //passwordWindow.db = db;
+                //bool? result = passwordWindow.ShowDialog();
+                //if (result == false)
+                //{
+                //    tControl.SelectedItem = e.RemovedItems[0];
+                //    return;
+                //}
+                checkPassText.Password = "";
+                pass.Visibility = Visibility.Visible;
+                admin.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        // ЗМІНА ПАРОЛЮ
+        private void SetPass_Click(object sender, RoutedEventArgs e)
+        {
+            if (curPass.Password.ToString() == db.Passwords.First().Pass)
+            {
+                db.Passwords.First().Pass = newPass.Password.ToString();
+                db.SaveChanges();
+                MessageBox.Show("Пароль успішно змінено!", "Повідомлення", MessageBoxButton.OK);
+            }
+            else
+                MessageBox.Show("Некоректний пароль!", "Помилка", MessageBoxButton.OK);
+        }
+        // ГІСТОГАМА ДОХОДУ
+        private void ChartYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Charts.AxisX.Clear();
+            Charts.AxisY.Clear();
+            var forCharts = db.Orders.Include(x => x.Service).Where(e => e.Date.Year == chartYear.SelectedIndex + 2020).GroupBy(x => x.Date.Month).OrderBy(m => m.Key).Select(g => new { Month = g.Key, TotalPrice = g.Sum(x => x.Service.Price)}).ToList();
+            Charts.Series = new LiveCharts.SeriesCollection() { new ColumnSeries() { Values = new ChartValues<double>(forCharts.Select(x => x.TotalPrice).ToList()), Title = "Дохід" } };
+            Charts.AxisX.Add(new Axis { Labels = forCharts.Select(e => e.Month.ToString()).ToList<string>(), Separator = new LiveCharts.Wpf.Separator { Step = 1 }, Title = "Місяці", FontSize = 12, Foreground = Brushes.Black, FontWeight = FontWeights.Bold } );
+            Charts.AxisY.Add(new Axis { Title = "Дохід", FontSize = 12, Foreground = Brushes.Black, FontWeight = FontWeights.Bold });
+            all.Content = forCharts.Select(x => x.TotalPrice).Sum() + " грн.";
+        }
+        // СТАТИСТИКА
+        private void Stats_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (statsName.SelectedIndex == 0)
+                gridStats.ItemsSource = db.Orders.Include(x => x.Employee).Where(e => e.Date.Year == statsYear.SelectedIndex + 2020 && e.Date.Month >= statsMounthFrom.SelectedIndex + 1 && e.Date.Month <= statsMounthTo.SelectedIndex + 1).GroupBy(x => x.Employee.Name).Select(g => new { Name = g.Key, Count = g.Count() }).ToList();
+            if (statsName.SelectedIndex == 1)
+                gridStats.ItemsSource = db.Orders.Include(x => x.Service).Where(e => e.Date.Year == statsYear.SelectedIndex + 2020 && e.Date.Month >= statsMounthFrom.SelectedIndex + 1 && e.Date.Month <= statsMounthTo.SelectedIndex + 1).GroupBy(x => x.Service.Name).Select(g => new { Name = g.Key, Count = g.Count() }).ToList();
+            if (statsName.SelectedIndex == 2)
+                gridStats.ItemsSource = db.Orders.Include(x => x.Customer).Where(e => e.Date.Year == statsYear.SelectedIndex + 2020 && e.Date.Month >= statsMounthFrom.SelectedIndex + 1 && e.Date.Month <= statsMounthTo.SelectedIndex + 1).GroupBy(x => x.Customer.Name).Select(g => new { Name = g.Key, Count = g.Count() }).ToList();
+
+        }
+
+
         //ПОЧАТОК ПОСАД
         public ObservableCollection<PositionVM> Positions
         {
@@ -84,17 +174,20 @@ namespace Task_1
             bool? result = positionWindow.ShowDialog();
             if (result == false)
             {
-
                 return;
             }
             db.Positions.Add(position);
             db.SaveChanges();
             OnPropertyChanged(nameof(Positions));
-
-            MessageBox.Show("ADDED SUCCESSFUL");
+            MessageBox.Show("Додано!");
         }
         private void EditPosition_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedPosition is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             PositionWindow positionWindow = new PositionWindow();
             positionWindow.ModelPosition = SelectedPosition;
             var oldName = SelectedPosition.Name;
@@ -106,15 +199,20 @@ namespace Task_1
             }
             db.SaveChanges();
             OnPropertyChanged(nameof(Positions));
-            MessageBox.Show("EDIDED SUCCESSFUL");
+            MessageBox.Show("Змінено!");
         }
         private void DeletePosition_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedPosition is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             var item = SelectedPosition.ModelPosition;
             db.Positions.Remove(item);
             db.SaveChanges();
             OnPropertyChanged(nameof(Positions));
-            MessageBox.Show("DELETED SUCCESSFUL");
+            MessageBox.Show("Видалено!");
         }
         // КІНЕЦЬ ПОСАД
 
@@ -149,11 +247,15 @@ namespace Task_1
             db.Services.Add(service);
             db.SaveChanges();
             OnPropertyChanged(nameof(Services));
-
-            MessageBox.Show("ADDED SUCCESSFUL");
+            MessageBox.Show("Додано!");
         }
         private void EditService_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedService is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             ServiceWindow serviceWindow = new ServiceWindow();
             serviceWindow.ModelService = SelectedService;
             var oldName = SelectedService.Name;
@@ -169,15 +271,20 @@ namespace Task_1
             }
             db.SaveChanges();
             OnPropertyChanged(nameof(Services));
-            MessageBox.Show("EDIDED SUCCESSFUL");
+            MessageBox.Show("Змінено!");
         }
         private void DeleteService_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedService is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             var item = SelectedService.ModelService;
             db.Services.Remove(item);
             db.SaveChanges();
             OnPropertyChanged(nameof(Services));
-            MessageBox.Show("DELETED SUCCESSFUL");
+            MessageBox.Show("Видалено!");
         }
         // КІНЕЦЬ ПОСЛУГ
 
@@ -212,10 +319,15 @@ namespace Task_1
             db.Customers.Add(customer);
             db.SaveChanges();
             OnPropertyChanged(nameof(Customers));
-            MessageBox.Show("ADDED SUCCESSFUL");
+            MessageBox.Show("Додано!");
         }
         private void EditCustomer_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedCustomer is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             CustomerWindow customerWindow = new CustomerWindow();
             customerWindow.ModelCustomer = SelectedCustomer;
             var oldName = SelectedCustomer.Name;
@@ -229,15 +341,20 @@ namespace Task_1
             }
             db.SaveChanges();
             OnPropertyChanged(nameof(Customers));
-            MessageBox.Show("EDIDED SUCCESSFUL");
+            MessageBox.Show("Змінено!");
         }
         private void DeleteCustomer_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedCustomer is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             var item = SelectedCustomer.ModelCustomer;
             db.Customers.Remove(item);
             db.SaveChanges();
             OnPropertyChanged(nameof(Customers));
-            MessageBox.Show("DELETED SUCCESSFUL");
+            MessageBox.Show("Видалено!");
         }
         private string _searchCustomer = "";
         public string SearchCustomer
@@ -284,17 +401,21 @@ namespace Task_1
             db.Employees.Add(employee);
             db.SaveChanges();
             OnPropertyChanged(nameof(Employees));
-            MessageBox.Show("ADDED SUCCESSFUL");
+            MessageBox.Show("Додано!");
         }
         private void EditEmployee_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedEmployee is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             EmployeeWindow employeeWindow = new EmployeeWindow();
             employeeWindow.Positions = Positions;
             employeeWindow.ModelEmployee = SelectedEmployee;
             var oldName = SelectedEmployee.Name;
             var oldPhone = SelectedEmployee.Phone;
             var oldPositionId = SelectedEmployee.PositionId;
-
             bool? result = employeeWindow.ShowDialog();
             if (result == false)
             {
@@ -305,72 +426,62 @@ namespace Task_1
             }
             db.SaveChanges();
             OnPropertyChanged(nameof(Employees));
-            MessageBox.Show("EDIDED SUCCESSFUL");
+            MessageBox.Show("Змінено!");
         }
         private void DeleteEmployee_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectedEmployee is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             var item = SelectedEmployee.ModelEmployee;
             db.Employees.Remove(item);
             db.SaveChanges();
             OnPropertyChanged(nameof(Employees));
-            MessageBox.Show("DELETED SUCCESSFUL");
+            MessageBox.Show("Видалено!");
         }
-
-        //private void EditEmployee_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var item = (Employee)gridEmployee.SelectedItem;
-        //    var obj = db.Employees.Find(item.Id);
-        //    EmployeeWindow employeeWindow = new EmployeeWindow();
-        //    employeeWindow.textName.Text = obj.Name;
-        //    employeeWindow.textPhone.Text = obj.Phone;
-        //    employeeWindow.cbPosition.SelectedIndex = employeeWindow.cbPosition.Items.Cast<Position>().ToList().FindIndex(p => p.Id == obj.PositionId);
-        //    bool? result = employeeWindow.ShowDialog();
-        //    if (result == false)
-        //        return;
-        //    obj.Name = employeeWindow.textName.Text;
-        //    obj.Phone = employeeWindow.textPhone.Text;
-        //    var pos = (Position)employeeWindow.cbPosition.SelectedItem;
-        //    obj.Position = db.Positions.Find(pos.Id);
-        //    db.SaveChanges();
-        //    gridEmployee.Items.Refresh();
-        //    MessageBox.Show("EDIDED SUCCESSFUL");
-        //}
         // КІНЕЦЬ СПІВРОБІТНИКІВ
 
-        // ПОЧАТОК РОЗКЛАДУ
-        
+        // ПОЧАТОК РОЗКЛАДУ     
         public ObservableCollection<ScheduleVM> Schedules
         {
             get
             {
-                return new(db.Schedules.Select(x => new ScheduleVM { ModelSchedule = x }));
+                return new(db.Schedules.Where(e => e.Employee == SelectedEmployeeSchedule.ModelEmployee).Select(x => new ScheduleVM { ModelSchedule = x }));
             }
         }
-        private EmployeeVM _selectedSchedule;
-        public EmployeeVM SelectedSchedule
+        private EmployeeVM _selectedEmployeeSchedule = new EmployeeVM { };
+        public EmployeeVM SelectedEmployeeSchedule
         {
-            get => _selectedSchedule;
+            get => _selectedEmployeeSchedule;
             set
             {
-                _selectedSchedule = value;
-                OnPropertyChanged(nameof(SelectedSchedule));
+                _selectedEmployeeSchedule = value;
+                OnPropertyChanged(nameof(SelectedEmployeeSchedule));
+                OnPropertyChanged(nameof(Schedules));
+                OnPropertyChanged(nameof(Orders));
             }
         }
         private void AddSchedule_Click(object sender, RoutedEventArgs e)
         {
-            var schedule = new Schedule();
+            if (SelectedEmployeeSchedule.ModelEmployee is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             ScheduleWindow scheduleWindow = new ScheduleWindow();
             scheduleWindow.Employees = Employees;
-            scheduleWindow.ModelSchedule = new ScheduleVM { ModelSchedule = schedule };
+            scheduleWindow.Schedules = Schedules;
+            scheduleWindow.db = db;
+            scheduleWindow.ModelEmployee = new EmployeeVM { ModelEmployee = SelectedEmployeeSchedule.ModelEmployee };
             bool? result = scheduleWindow.ShowDialog();
             if (result == false)
             {
                 return;
             }
-            db.Schedules.Add(schedule);
-            db.SaveChanges();
             OnPropertyChanged(nameof(Schedules));
-            MessageBox.Show("ADDED SUCCESSFUL");
+            MessageBox.Show("Додано!");
         }
         // КІНЕЦЬ РОЗКЛАДУ
 
@@ -379,7 +490,18 @@ namespace Task_1
         {
             get
             {
-                return new(db.Orders.Select(x => new OrderVM { ModelOrder = x }));
+                return new(db.Orders.Where(e => e.Date == SelectedDate && e.Employee == SelectedEmployeeSchedule.ModelEmployee).Select(x => new OrderVM { ModelOrder = x }));
+            }
+        }
+        private DateTime _selectedDate = DateTime.Now;
+        public DateTime SelectedDate
+        {
+            get => _selectedDate;
+            set
+            {
+                _selectedDate = value;
+                OnPropertyChanged(nameof(SelectedDate));
+                OnPropertyChanged(nameof(Orders));
             }
         }
         private OrderVM _selectedOrder;
@@ -399,7 +521,7 @@ namespace Task_1
             orderWindow.Employees = Employees;
             orderWindow.Customers = Customers;
             orderWindow.Services = Services;
-            orderWindow.ModelOrder = new OrderVM { ModelOrder = order };
+            orderWindow.ModelOrder = new OrderVM { ModelOrder = order };            
             bool? result = orderWindow.ShowDialog();
             if (result == false)
             {
@@ -408,42 +530,52 @@ namespace Task_1
             db.Orders.Add(order);
             db.SaveChanges();
             OnPropertyChanged(nameof(Orders));
-            MessageBox.Show("ADDED SUCCESSFUL");
+            MessageBox.Show("Додано!");
         }
-        //private void EditOrder_Click(object sender, RoutedEventArgs e)
-        //{
-        //    OrderWindow orderWindow = new OrderWindow();
-        //    orderWindow.Positions = Positions;
-        //    orderWindow.ModelOrder = SelectedOrder;
-        //    var oldName = SelectedOrder.Name;
-        //    var oldPhone = SelectedOrder.Phone;
-        //    var oldPositionId = SelectedOrder.PositionId;
-
-        //    bool? result = orderWindow.ShowDialog();
-        //    if (result == false)
-        //    {
-        //        SelectedOrder.Name = oldName;
-        //        SelectedOrder.Phone = oldPhone;
-        //        SelectedOrder.PositionId = oldPositionId;
-        //        return;
-        //    }
-        //    db.SaveChanges();
-        //    OnPropertyChanged(nameof(Orders));
-        //    MessageBox.Show("EDIDED SUCCESSFUL");
-        //}
-        //private void DeleteOrder_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var item = SelectedOrder.ModelOrder;
-        //    db.Orders.Remove(item);
-        //    db.SaveChanges();
-        //    OnPropertyChanged(nameof(Orders));
-        //    MessageBox.Show("DELETED SUCCESSFUL");
-        //}
-        // КІНЕЦЬ ЗАПИСІВ
-        private void CalendarSchedule_SelectedDatesChanged(object? sender, SelectionChangedEventArgs e)
+        private void EditOrder_Click(object sender, RoutedEventArgs e)
         {
-            DateTime? selectedDate = CalendarSchedule.SelectedDate;
-            //Schedule. 
+            if (SelectedOrder is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
+            OrderWindow orderWindow = new OrderWindow();
+            orderWindow.Employees = Employees;
+            orderWindow.Customers = Customers;
+            orderWindow.Services = Services;            
+            orderWindow.ModelOrder = SelectedOrder;
+            var oldEmployeeId = SelectedOrder.EmployeeId;
+            var oldCustomerId = SelectedOrder.CustomerId;
+            var olderviceId = SelectedOrder.ServiceId;
+            var oldDate = SelectedOrder.Date;
+            var oldStart = SelectedOrder.Start;
+            bool? result = orderWindow.ShowDialog();
+            if (result == false)
+            {
+                SelectedOrder.EmployeeId = oldEmployeeId;
+                SelectedOrder.CustomerId = oldCustomerId;
+                SelectedOrder.ServiceId = olderviceId;
+                SelectedOrder.Date = oldDate;
+                SelectedOrder.Start = oldStart;
+                return;
+            }
+            db.SaveChanges();
+            OnPropertyChanged(nameof(Orders));
+            MessageBox.Show("Змінено!");
         }
+        private void DeleteOrder_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedOrder is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
+            var item = SelectedOrder.ModelOrder;
+            db.Orders.Remove(item);
+            db.SaveChanges();
+            OnPropertyChanged(nameof(Orders));
+            MessageBox.Show("Видалено!");
+        }
+        // КІНЕЦЬ ЗАПИСІВ        
     }
 }

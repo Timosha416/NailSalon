@@ -34,7 +34,19 @@ namespace Task_1
                 OnPropertyChanged(nameof(Name));
             }
         }
-        
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            if (obj is not PositionVM) return false;
+            if ((obj as PositionVM).ModelPosition == null) return false;    
+            return ModelPosition.Id.Equals((obj as PositionVM).ModelPosition.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return ModelPosition.Id.GetHashCode();
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {

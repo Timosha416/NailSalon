@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -28,10 +29,12 @@ namespace Task_1
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
+        public double price;
         public ServiceVM ModelService { get; set; }
         public ServiceWindow()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             DataContext = this;
             Ok.Click += Ok_Click;
             Cancel.Click += Cancel_Click;
@@ -43,6 +46,11 @@ namespace Task_1
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
+            if (ModelService.ModelService.Name is null || ModelService.ModelService.Name == "" || !double.TryParse(ModelService.ModelService.Price.ToString(), out price))
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             this.DialogResult = true;
         }
     }

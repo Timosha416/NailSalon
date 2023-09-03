@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -61,16 +62,27 @@ namespace Task_1
                 OnPropertyChanged(nameof(End));
             }
         }
-        public Employee Employee
+        public EmployeeVM Employee
         {
-            get { return ModelSchedule.Employee; }
+            get { return new EmployeeVM { ModelEmployee = ModelSchedule.Employee }; }
             set
             {
-                ModelSchedule.Employee = value;
+                ModelSchedule.Employee = value.ModelEmployee;
                 OnPropertyChanged(nameof(Employee));
             }
         }
-
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            if (obj is not ScheduleVM) return false;
+            if ((obj as ScheduleVM).ModelSchedule == null) return false;
+            return ModelSchedule.Id.Equals((obj as ScheduleVM).ModelSchedule.Id);
+        }
+        
+        public override int GetHashCode()
+        {
+            return ModelSchedule.Id.GetHashCode();
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -46,12 +47,28 @@ namespace Task_1
         }
         public TimeSpan Lenght
         {
-            get { return ModelService.Lenght; }
+            get {
+                if (ModelService.Lenght.Hours == 0 && ModelService.Lenght.Minutes == 0)
+                    ModelService.Lenght = new TimeSpan(1,0,0);
+                return ModelService.Lenght; 
+            }
             set
             {
                 ModelService.Lenght = value;
                 OnPropertyChanged(nameof(Lenght));
             }
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            if (obj is not ServiceVM) return false;
+            if ((obj as ServiceVM).ModelService == null) return false;
+            return ModelService.Id.Equals((obj as ServiceVM).ModelService.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return ModelService.Id.GetHashCode();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

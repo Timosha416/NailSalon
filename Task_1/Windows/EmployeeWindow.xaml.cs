@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -31,23 +32,11 @@ namespace Task_1
         }
         public ObservableCollection<PositionVM> Positions { get; set; }
         public EmployeeVM ModelEmployee { get; set; }
-        public PositionVM _selectedPosition;
-        public PositionVM SelectedPosition
-        {   
-            get
-            {                
-                return _selectedPosition;
-            }
-            set
-            {
-                _selectedPosition = value;
-                ModelEmployee.PositionId = value.Id;
-                OnPropertyChanged(nameof(SelectedPosition));
-            }
-        }
+        
         public EmployeeWindow()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             DataContext = this;
             Ok.Click += Ok_Click;
             Cancel.Click += Cancel_Click;
@@ -59,6 +48,11 @@ namespace Task_1
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
+            if (ModelEmployee.ModelEmployee.Name is null || ModelEmployee.ModelEmployee.Phone is null || ModelEmployee.ModelEmployee.Position is null)
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             this.DialogResult = true;
         }
     }

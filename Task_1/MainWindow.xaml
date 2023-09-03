@@ -3,64 +3,109 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:Task_1"
         mc:Ignorable="d"
-        Title="Манікюрний салон" Height="450" Width="800">    
+        Title="Манікюрний салон" Height="450" Width="800" ResizeMode="NoResize">        
+    <Window.Resources>
+        <ControlTemplate TargetType="Button" x:Key="btmTemp">
+            <Border CornerRadius="10" BorderThickness="2" Margin ="0" BorderBrush="{TemplateBinding BorderBrush}" Background="Transparent">
+                <ContentControl Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
+            </Border>
+        </ControlTemplate>
+    </Window.Resources>
     <Grid>
-        <TabControl>
+        <Grid.Background>
+            <ImageBrush ImageSource="C:\Users\timos\source\repos\NailSalon\Task_1\Images\orderback.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
+        <TabControl x:Name="tControl" Margin="10,0,10,0" Background="Transparent">
             <!--ЗАПИСИ-->
-            <TabItem Header="Записи">
-                <Grid Background="#FFE5E5E5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="4*"/>
-                </Grid.ColumnDefinitions>
-                <Calendar x:Name="CalendarOrder" Margin="5" Grid.Row="0" Grid.Column="0"/>
-                <Button x:Name="AddOrder" Content="Add" Grid.Column="0" Margin="10,10,10,140" Grid.Row="1"/>
-                <DataGrid x:Name="gridOrder" AutoGenerateColumns="False" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
-                          ItemsSource="{Binding Path=Orders}" SelectedItem="{Binding Path=SelectedOrder}">
-                    <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
-                            <DataGridTextColumn Header="Employee" Binding="{Binding Employee.Name}" Width="7*" />
-                            <DataGridTextColumn Header="Customer" Binding="{Binding Customer.Name}" Width="3*" />
-                            <DataGridTextColumn Header="Service" Binding="{Binding Service.Name}" Width="2*" />
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" Width="2*" />
-                            <DataGridTextColumn Header="Start" Binding="{Binding Start, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
-                        </DataGrid.Columns>
-                </DataGrid>
-                </Grid>
-            </TabItem>
-            <!--РОЗКЛАД-->
-            <TabItem Header="Розклад">
-                <Grid Background="#FFE5E5E5">
+            <TabItem Name="order" Background="Transparent">
+                <TabItem.Header>
+                    <StackPanel Orientation="Vertical" Background="Transparent">
+                        <Image Source="C:\Users\timos\source\repos\NailSalon\Task_1\Images\order.png" Width="50" Height="30" Margin="1,1,1,1" />
+                        <TextBlock Text="Записи" TextAlignment="Center" Margin="2" Background="Transparent"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="4*"/>
                     </Grid.ColumnDefinitions>
-                    <Calendar x:Name="CalendarSchedule" Margin="5" Grid.Row="0" Grid.Column="0"/>
-                    <Button x:Name="AddSchedule" Content="Set up a schedule" Grid.Column="0" Margin="10,10,10,140" Grid.Row="1"/>
-                    <DataGrid x:Name="gridSchedule" AutoGenerateColumns="False" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
-                              ItemsSource="{Binding Path=Schedules}" SelectedItem="{Binding Path=SelectedSchedule}">
+                    <Calendar x:Name="CalendarOrder" Background="Transparent" Margin="2" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" SelectedDate="{Binding SelectedDate, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold"  BorderBrush="Black" BorderThickness="2"/>
+                    <Button x:Name="AddOrder" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Додати" Grid.Column="0" Margin="10" Grid.Row="3" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                    <Button x:Name="EditOrder" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Редагувати" Grid.Column="0" Margin="10" Grid.Row="4" Foreground="Blue" FontWeight="Bold"  BorderBrush="Blue" BorderThickness="2"/>
+                    <Button x:Name="DeleteOrder" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Видалити" Grid.Column="0" Margin="10" Grid.Row="5" Foreground="Red" FontWeight="Bold"  BorderBrush="Red" BorderThickness="2"/>
+                    <Label Content="Працівник:" Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="10" FontWeight="Bold" FontSize="20"/>
+                    <ComboBox x:Name="cbEmployeeOrder" Background="Transparent" DisplayMemberPath="Name" Grid.Row="0" Grid.Column="2" Margin="5" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" 
+                              ItemsSource="{Binding Path=Employees}" SelectedItem="{Binding Path=SelectedEmployeeSchedule, UpdateSourceTrigger=PropertyChanged}"/>
+                    <DataGrid x:Name="gridOrder" IsReadOnly ="True"  Background="Transparent" AutoGenerateColumns="False" Grid.Row="1" Grid.RowSpan="6" Grid.Column="1" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="2"  
+                          ItemsSource="{Binding Path=Orders}" SelectedItem="{Binding Path=SelectedOrder}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Employee" Binding="{Binding Path=Employee.Name}" Width="4*" />
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="3*" />
-                            <DataGridTextColumn Header="Start" Binding="{Binding Start, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
-                            <DataGridTextColumn Header="End" Binding="{Binding End, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                            <DataGridTextColumn Header="Клієнт" Binding="{Binding Customer.Name}" Width="3*" />
+                            <!--<DataGridTextColumn Header="Номер телефону" Binding="{Binding Customer.Phone}" Width="3*" />-->
+                            <DataGridTextColumn Header="Послуга" Binding="{Binding Service.Name}" Width="2*" />
+                            <DataGridTextColumn Header="Дата" Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" Width="1*" />
+                            <DataGridTextColumn Header="Час" Binding="{Binding Start, StringFormat={}{0:hh}:{0:mm}}" Width="1*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <!--РОЗКЛАД-->
+            <TabItem Name="schedule" Background="Transparent">
+                <TabItem.Header>
+                    <StackPanel Orientation="Vertical" Background="Transparent">
+                        <Image Source="C:\Users\timos\source\repos\NailSalon\Task_1\Images\schedule.png" Width="50" Height="30" Margin="1,1,1,1" />
+                        <TextBlock Text="Розклад" TextAlignment="Center" Margin="2" Background="Transparent"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Background="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="4*"/>
+                    </Grid.ColumnDefinitions>
+                    <Calendar x:Name="CalendarSchedule" Margin="2" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Background="Transparent" FontWeight="Bold"  BorderBrush="Black" BorderThickness="2"/>
+                    <Button x:Name="AddSchedule" Template="{StaticResource ResourceKey=btmTemp}" Content="Згенерувати розклад" Grid.Column="0" Margin="10" Grid.Row="3" Background="Transparent" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                    <Label Content="Працівник:" Grid.Row="0" Grid.Column="1" Margin="10" Background="Transparent" FontWeight="Bold" FontSize="20"/>
+                    <ComboBox x:Name="cbEmployee" Background="Transparent" DisplayMemberPath="Name" Grid.Row="0" Grid.Column="2" Margin="5" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" 
+                              ItemsSource="{Binding Path=Employees}" SelectedItem="{Binding Path=SelectedEmployeeSchedule, UpdateSourceTrigger=PropertyChanged}"/>
+                    <DataGrid x:Name="gridSchedule" IsReadOnly ="True" Background="Transparent" AutoGenerateColumns="False" Grid.Row="1" Grid.RowSpan="5" Grid.Column="1" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="2" 
+                              ItemsSource="{Binding Path=Schedules}" SelectedItem="{Binding Path=SelectedEmployee}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="День" Binding="{Binding Date}" Width="4*" />
+                            <DataGridTextColumn Header="Початок" Binding="{Binding Start, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                            <DataGridTextColumn Header="Кінець" Binding="{Binding End, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
             <!--ПОСЛУГИ-->
-            <TabItem Header="Послуги">
-                <Grid Background="#FFE5E5E5">
+            <TabItem Name="service" Background="Transparent">
+                <TabItem.Header>
+                    <StackPanel Orientation="Vertical" Background="Transparent">
+                        <Image Source="C:\Users\timos\source\repos\NailSalon\Task_1\Images\service.png" Width="50" Height="30" Margin="1,1,1,1" />
+                        <TextBlock Text="Послуги" TextAlignment="Center" Margin="2" Background="Transparent"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
@@ -75,26 +120,31 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="5*"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="AddService" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
-                    <Button x:Name="EditService" Content="Edit" Grid.Row="1" Margin="5" Grid.Column="0"/>
-                    <Button x:Name="DeleteService" Content="Delete" Grid.Row="2" Margin="5" Grid.Column="0"/>
-                    <DataGrid x:Name="gridService" AutoGenerateColumns="False" ItemsSource="{Binding Path=Services}"
-                                          SelectedItem="{Binding Path=SelectedService}" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" Width="642">
+                    <Button x:Name="AddService" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Додати" Grid.Row="0" Margin="5" Grid.Column="0" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                    <Button x:Name="EditService" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Редагувати" Grid.Row="1" Margin="5" Grid.Column="0" Foreground="Blue" FontWeight="Bold"  BorderBrush="Blue" BorderThickness="2"/>
+                    <Button x:Name="DeleteService" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Видалити" Grid.Row="2" Margin="5" Grid.Column="0" Foreground="Red" FontWeight="Bold"  BorderBrush="Red" BorderThickness="2"/>
+                    <DataGrid x:Name="gridService" IsReadOnly ="True" Background="Transparent" AutoGenerateColumns="False" ItemsSource="{Binding Path=Services}" BorderBrush="Black" BorderThickness="2" 
+                                          SelectedItem="{Binding Path=SelectedService}" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="4*" />
-                            <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="2*" />
-                            <DataGridTextColumn Header="Lenght" Binding="{Binding Lenght, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
+                            <DataGridTextColumn Header="Назва" Binding="{Binding Name}" Width="4*" />
+                            <DataGridTextColumn Header="Ціна, грн" Binding="{Binding Price}" Width="2*" />
+                            <DataGridTextColumn Header="Тривалість, хв" Binding="{Binding Lenght, StringFormat={}{0:hh}:{0:mm}}" Width="2*" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
             <!--КЛІЄНТИ-->
-            <TabItem Header="Клієнти">
-                <Grid Background="#FFE5E5E5">
+            <TabItem Name="customer" Background="Transparent">
+                <TabItem.Header>
+                    <StackPanel Orientation="Vertical" Background="Transparent">
+                        <Image Source="C:\Users\timos\source\repos\NailSalon\Task_1\Images\customer.png" Width="50" Height="30" Margin="1,1,1,1" />
+                        <TextBlock Text="Клієнти" TextAlignment="Center" Margin="2" Background="Transparent"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
-                        <RowDefinition Height="10*"/>
+                        <RowDefinition Height="6*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
@@ -104,27 +154,59 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="AddCustomer" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
-                    <Button x:Name="EditCustomer" Content="Edit" Grid.Row="0" Margin="5" Grid.Column="1"/>
-                    <Button x:Name="DeleteCustomer" Content="Delete" Grid.Row="0" Margin="5" Grid.Column="2"/>
-                    <Label Content="Search:" Grid.Row="0" Margin="5" Grid.Column="3" HorizontalAlignment="Right"/>
-                    <TextBox Text="{Binding Path=SearchCustomer, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Margin="5" Grid.Column="4" Grid.ColumnSpan="2"/>
-                    <DataGrid x:Name="gridCustomer" AutoGenerateColumns="False" ItemsSource="{Binding Path=Customers}"
-                                          SelectedItem="{Binding Path=SelectedCustomer}" HorizontalAlignment="Center" Width="794" Grid.Row="1" Grid.ColumnSpan="6">
+                    <Button x:Name="AddCustomer" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Додати" Grid.Row="0" Margin="5" Grid.Column="0" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                    <Button x:Name="EditCustomer" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Реадгувати" Grid.Row="0" Margin="5" Grid.Column="1" Foreground="Blue" FontWeight="Bold"  BorderBrush="Blue" BorderThickness="2"/>
+                    <Button x:Name="DeleteCustomer" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Видалити" Grid.Row="0" Margin="5" Grid.Column="2" Foreground="Red" FontWeight="Bold"  BorderBrush="Red" BorderThickness="2"/>
+                    <Label Content="Search:" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="3" HorizontalAlignment="Right" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding Path=SearchCustomer, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="4" Grid.ColumnSpan="2" FontSize="16" VerticalAlignment="Center"/>
+                    <DataGrid x:Name="gridCustomer" IsReadOnly ="True" Background="Transparent" AutoGenerateColumns="False" ItemsSource="{Binding Path=Customers}" BorderBrush="Black" BorderThickness="2" 
+                                          SelectedItem="{Binding Path=SelectedCustomer}" HorizontalAlignment="Center" Grid.Row="1" Grid.ColumnSpan="6">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="7*" />
-                            <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="3*" />
+                            <DataGridTextColumn Header="Прізвище, Ім'я, По батькові" Binding="{Binding Name}" Width="7*" />
+                            <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="3*" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Адміністратор">
-                <Grid Background="#FFE5E5E5">
-                    <TabControl>
+            <!--ВВЕДЕННЯ ПАРОЛЮ-->
+            <TabItem x:Name="pass" Background="Transparent">
+                <TabItem.Header>
+                    <StackPanel Orientation="Vertical" Background="Transparent">
+                        <Image Source="C:\Users\timos\source\repos\NailSalon\Task_1\Images\admin.png" Width="50" Height="30" Margin="1,1,1,1" />
+                        <TextBlock Text="Адміністратор" TextAlignment="Center" Margin="2" Background="Transparent"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Background="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Введіть пароль:" Grid.Row="1" Grid.Column="1" Margin="5" Background="Transparent" HorizontalAlignment="Right" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
+                    <PasswordBox x:Name="checkPassText" Grid.Row="1" Grid.Column="2" Background="Transparent" HorizontalAlignment="Center" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Width="174" Height="31" VerticalContentAlignment="Center"/> 
+                    <Button x:Name="checkPass" Content="Увійти" Template="{StaticResource ResourceKey=btmTemp}" Grid.Row="2" Grid.Column="2" Margin="15" Background="Transparent" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                </Grid>
+            </TabItem>
+            <!--АДМІНІСТРАТОР-->
+            <TabItem x:Name="admin" Background="Transparent" Visibility="Collapsed">
+                <TabItem.Header>
+                    <StackPanel Orientation="Vertical" Background="Transparent">
+                        <Image Source="C:\Users\timos\source\repos\NailSalon\Task_1\Images\admin.png" Width="50" Height="30" Margin="1,1,1,1" />
+                        <TextBlock Text="Адміністратор" TextAlignment="Center" Margin="2" Background="Transparent"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Background="Transparent">
+                    <TabControl Background="Transparent">
                         <!--СПІВРОБІТНИКИ-->
-                        <TabItem Header="Співробітники">
-                            <Grid Background="#FFE5E5E5">
+                        <TabItem Header="Співробітники" Background="Transparent">
+                            <Grid Background="Transparent">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="1*"/>
@@ -139,23 +221,22 @@
                                     <ColumnDefinition Width="1*"/>
                                     <ColumnDefinition Width="5*"/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="AddEmployee" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
-                                <Button x:Name="EditEmployee" Content="Edit" Grid.Row="1" Margin="5" Grid.Column="0"/>
-                                <Button x:Name="DeleteEmployee" Content="Delete" Grid.Row="2" Margin="5" Grid.Column="0"/>
-                                <DataGrid x:Name="gridEmployee" AutoGenerateColumns="False" ItemsSource="{Binding Path=Employees}"
-                                          SelectedItem="{Binding Path=SelectedEmployee}" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" Width="642">
+                                <Button x:Name="AddEmployee" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Додати" Grid.Row="0" Margin="5" Grid.Column="0" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                                <Button x:Name="EditEmployee" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Редагувати" Grid.Row="1" Margin="5" Grid.Column="0" Foreground="Blue" FontWeight="Bold"  BorderBrush="Blue" BorderThickness="2"/>
+                                <Button x:Name="DeleteEmployee" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Видалити" Grid.Row="2" Margin="5" Grid.Column="0" Foreground="Red" FontWeight="Bold"  BorderBrush="Red" BorderThickness="2"/>
+                                <DataGrid x:Name="gridEmployee" IsReadOnly ="True" Background="Transparent" AutoGenerateColumns="False" ItemsSource="{Binding Path=Employees}" BorderBrush="Black" BorderThickness="2" 
+                                          SelectedItem="{Binding Path=SelectedEmployee}" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="7*" />
-                                        <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="3*" />
-                                        <DataGridTextColumn Header="Position" Binding="{Binding Position.Name}" Width="3*" />
+                                        <DataGridTextColumn Header="Прізвище, Ім'я, По батькові" Binding="{Binding Name}" Width="4*" />
+                                        <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="3*" />
+                                        <DataGridTextColumn Header="Посада" Binding="{Binding Position.Name}" Width="3*" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Grid>
                         </TabItem>
                         <!--ПОСАДИ-->
-                        <TabItem Header="Посади">
-                            <Grid Background="#FFE5E5E5">
+                        <TabItem Header="Посади" Background="Transparent">
+                            <Grid Background="Transparent">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="1*"/>
@@ -170,28 +251,97 @@
                                     <ColumnDefinition Width="1*"/>
                                     <ColumnDefinition Width="5*"/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="AddPosition" Content="Add" Grid.Row="0" Margin="5" Grid.Column="0"/>
-                                <Button x:Name="EditPosition" Content="Edit" Grid.Row="1" Margin="5" Grid.Column="0"/>
-                                <Button x:Name="DeletePosition" Content="Delete" Grid.Row="2" Margin="5" Grid.Column="0"/>                                
-                                <DataGrid x:Name="gridPosition" AutoGenerateColumns="False"
+                                <Button x:Name="AddPosition" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Додати" Grid.Row="0" Margin="5" Grid.Column="0" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                                <Button x:Name="EditPosition" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Редагувати" Grid.Row="1" Margin="5" Grid.Column="0" Foreground="Blue" FontWeight="Bold"  BorderBrush="Blue" BorderThickness="2"/>
+                                <Button x:Name="DeletePosition" Template="{StaticResource ResourceKey=btmTemp}" Background="Transparent" Content="Видалити" Grid.Row="2" Margin="5" Grid.Column="0" Foreground="Red" FontWeight="Bold"  BorderBrush="Red" BorderThickness="2"/>
+                                <DataGrid x:Name="gridPosition" IsReadOnly ="True" Background="Transparent" AutoGenerateColumns="False" BorderBrush="Black" BorderThickness="2" 
                                           ItemsSource="{Binding Path=Positions}"
                                           SelectedItem="{Binding Path=SelectedPosition}"
-                                          HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" Width="642">
+                                          HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="8" Grid.Column="1">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="1*" />
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="7*" />
+                                        <DataGridTextColumn Header="Назва посади" Binding="{Binding Name}" Width="7*" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Статистика по клієнтам">
-                            <Grid Background="#FFE5E5E5"/>
+                        <!--СТАТИСТИКА-->
+                        <TabItem Header="Статистика" Background="Transparent">
+                            <Grid Background="Transparent">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="6*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox x:Name="statsName" Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" >
+                                    <ComboBoxItem Content="По працівникам"/>
+                                    <ComboBoxItem Content="По послугам"/>
+                                    <ComboBoxItem Content="По клієнтам"/>
+                                </ComboBox>
+                                <Label Content="Місяць, з:" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="statsMounthFrom" Grid.Row="0" Grid.Column="2" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" />
+                                <Label Content="Місяць, по:" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="3" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="statsMounthTo" Grid.Row="0" Grid.Column="4" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" />
+                                <Label Content="Рік:" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="5" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="statsYear" Grid.Row="0" Grid.Column="6" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" />
+                                <DataGrid x:Name="gridStats" IsReadOnly ="True" Background="Transparent" AutoGenerateColumns="False" HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="7" Grid.Row="1" BorderBrush="Black" BorderThickness="2" >
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Назва" Binding="{Binding Name}" Width="2*" />
+                                        <DataGridTextColumn Header="Кількість" Binding="{Binding Count}" Width="1*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
                         </TabItem>
-                        <TabItem Header="Статистика по послугам">
-                            <Grid Background="#FFE5E5E5"/>
+                        <!--ДОХІД-->
+                        <TabItem Header="Гістограма доходу" Background="Transparent">
+                            <Grid Background="Transparent">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="5*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Рік:" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="0" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="chartYear" Grid.Row="0" Grid.Column="1" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" FontWeight="Bold" VerticalContentAlignment="Center" />
+                                <Label Content="Дохід за рік:" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="3" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <Label x:Name="all" Content="" Background="Transparent" Grid.Row="0" Margin="5" Grid.Column="4" HorizontalAlignment="Left" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <lvc:CartesianChart x:Name="Charts" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Margin="5" Background="Transparent">
+                                </lvc:CartesianChart>
+                            </Grid>
                         </TabItem>
-                        <TabItem Header="Каса">
-                            <Grid Background="#FFE5E5E5"/>
+                        <!--ПАРОЛЬ-->
+                        <TabItem Header="Зміна паролю" Background="Transparent">
+                            <Grid Background="Transparent">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="3*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Поточний пароль:" Grid.Row="0" Grid.Column="0" Margin="5" Background="Transparent" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <PasswordBox x:Name="curPass" Grid.Column="1" Background="Transparent" HorizontalAlignment="Center" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Width="182" Height="25" VerticalContentAlignment="Center"/>
+                                <Label Content="Новий пароль:" Grid.Row="1" Grid.Column="0" Margin="5" Background="Transparent" HorizontalAlignment="Right" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <PasswordBox x:Name="newPass" Grid.Row="1" Grid.Column="1" Background="Transparent" HorizontalAlignment="Center" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Width="182" Height="26" VerticalContentAlignment="Center"/>
+                                <Button x:Name="setPass" Content="Змінити пароль" Template="{StaticResource ResourceKey=btmTemp}" Grid.Row="2" Grid.Column="1" Margin="5" Background="Transparent" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                 </Grid>

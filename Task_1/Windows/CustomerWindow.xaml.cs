@@ -32,6 +32,7 @@ namespace Task_1
         public CustomerWindow()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             DataContext = this;
             Ok.Click += Ok_Click;
             Cancel.Click += Cancel_Click;
@@ -43,6 +44,11 @@ namespace Task_1
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
+            if (ModelCustomer.ModelCustomer.Name is null || ModelCustomer.ModelCustomer.Phone is null || ModelCustomer.ModelCustomer.Name =="" || ModelCustomer.ModelCustomer.Phone == "")
+            {
+                MessageBox.Show("Оберіть значення!", "Повідомлення", MessageBoxButton.OK);
+                return;
+            }
             this.DialogResult = true;
         }
     }

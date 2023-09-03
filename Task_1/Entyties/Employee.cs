@@ -13,7 +13,7 @@ namespace Task_1
         public int Id { get; set; }
         [MaxLength(50)]
         public string Name { get; set; }
-        [MaxLength(10)]
+        [MaxLength(13)]
         public string Phone { get; set; }
         public int PositionId { get; set; }
         public virtual Position Position { get; set; }

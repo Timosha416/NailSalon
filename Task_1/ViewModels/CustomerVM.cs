@@ -44,6 +44,18 @@ namespace Task_1
                 OnPropertyChanged(nameof(Phone));
             }
         }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            if (obj is not CustomerVM) return false;
+            if ((obj as CustomerVM).ModelCustomer == null) return false;
+            return ModelCustomer.Id.Equals((obj as CustomerVM).ModelCustomer.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return ModelCustomer.Id.GetHashCode();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")

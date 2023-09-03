@@ -53,14 +53,26 @@ namespace Task_1
                 OnPropertyChanged(nameof(PositionId));
             }
         }
-        public Position Position
+        public PositionVM Position
         {
-            get { return ModelEmployee.Position; }
+            get { return new PositionVM { ModelPosition = ModelEmployee.Position }; }
             set
             {
-                ModelEmployee.Position = value;
+                ModelEmployee.Position = value.ModelPosition;
                 OnPropertyChanged(nameof(Position));
             }
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            if (obj is not EmployeeVM) return false;
+            if ((obj as EmployeeVM).ModelEmployee == null) return false;
+            return ModelEmployee.Id.Equals((obj as EmployeeVM).ModelEmployee.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return ModelEmployee.Id.GetHashCode();
         }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")

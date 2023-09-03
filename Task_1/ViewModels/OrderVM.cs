@@ -7,8 +7,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
+using Task_1;
 
 namespace Task_1
 {
@@ -54,7 +56,14 @@ namespace Task_1
         }
         public DateTime Date
         {
-            get { return ModelOrder.Date; }
+            get
+            {
+                if (ModelOrder.Date.Year == 1)
+                {
+                    ModelOrder.Date = DateTime.Now;
+                }
+                return ModelOrder.Date;
+            }
             set
             {
                 ModelOrder.Date = value;
@@ -63,41 +72,46 @@ namespace Task_1
         }
         public TimeSpan Start
         {
-            get { return ModelOrder.Start; }
+            get {
+                if (ModelOrder.Start.Hours == 0)
+                {
+                    ModelOrder.Start = new TimeSpan (8, 0, 0);
+                }
+                return ModelOrder.Start; }
             set
             {
                 ModelOrder.Start = value;
                 OnPropertyChanged(nameof(Start));
             }
         }
-       
-        public Employee Employee
+        public EmployeeVM Employee
         {
-            get { return ModelOrder.Employee; }
+            get { return new EmployeeVM { ModelEmployee = ModelOrder.Employee }; }
             set
             {
-                ModelOrder.Employee = value;
+                ModelOrder.Employee = value.ModelEmployee;
                 OnPropertyChanged(nameof(Employee));
             }
         }
-        public Customer Customer
+        public CustomerVM Customer
         {
-            get { return ModelOrder.Customer; }
+            get { return new CustomerVM { ModelCustomer = ModelOrder.Customer }; }
             set
             {
-                ModelOrder.Customer = value;
+                ModelOrder.Customer = value.ModelCustomer;
                 OnPropertyChanged(nameof(Customer));
             }
         }
-        public Service Service
+
+        public ServiceVM Service
         {
-            get { return ModelOrder.Service; }
+            get { return new ServiceVM { ModelService = ModelOrder.Service }; }
             set
             {
-                ModelOrder.Service = value;
+                ModelOrder.Service = value.ModelService;
                 OnPropertyChanged(nameof(Service));
             }
-        }
+        }       
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {

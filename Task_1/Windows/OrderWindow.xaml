@@ -5,8 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Task_1" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Employee" Height="350" Width="400">    
+        Title="Запис" Height="350" Width="450">
+    <Window.Resources>
+        <ControlTemplate TargetType="Button" x:Key="btmTemp">
+            <Border CornerRadius="10" BorderThickness="2" Margin ="0" BorderBrush="{TemplateBinding BorderBrush}" Background="Transparent">
+                <ContentControl Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
+            </Border>
+        </ControlTemplate>
+    </Window.Resources>
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="C:\Users\timos\source\repos\NailSalon\Task_1\Images\orderback.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -21,20 +31,22 @@
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Label Content="Employee:" Grid.Row="0" Grid.Column="0" Margin="10"/>
-        <ComboBox x:Name="cbEmployee" DisplayMemberPath="Name" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5"
-                  ItemsSource="{Binding Path=Employees}" SelectedItem="{Binding Path=SelectedEmployee}"/>
-        <Label Content="Customer:" Grid.Row="1" Grid.Column="0" Margin="10"/>
-        <ComboBox x:Name="cbCustomer" DisplayMemberPath="Name" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="5"
-                  ItemsSource="{Binding Path=Customers}" SelectedItem="{Binding Path=SelectedCustomer}" />
-        <Label Content="Service:" Grid.Row="2" Grid.Column="0" Margin="10"/>
-        <ComboBox x:Name="cbService" DisplayMemberPath="Name" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5"
-                  ItemsSource="{Binding Path=Services}" SelectedItem="{Binding Path=SelectedService}"/>
-        <Label Content="Date:" Grid.Row="3" Grid.Column="0" Margin="10"/>        
-        <DatePicker x:Name="dpDate" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" SelectedDateFormat="Short"/>
-        <Label Content="Time:" Grid.Row="4" Grid.Column="0" Margin="10"/>
-        <xctk:TimePicker x:Name="tpStart" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" TimeInterval="00:30:00" Format="ShortTime"/>
-        <Button x:Name="Ok" Content="OK" Grid.Row="5" Grid.Column="2" Margin="10"/>
-        <Button x:Name="Cancel" Content="Cancel" Grid.Row="5" Grid.Column="3" Margin="10,10,10,10"/>
+        <Label Content="Працівник:" Grid.Row="0" Grid.Column="0" Margin="10" Background="Transparent" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+        <ComboBox x:Name="cbEmployee" DisplayMemberPath="Name" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" VerticalContentAlignment="Center"
+                  ItemsSource="{Binding Path=Employees}" SelectedItem="{Binding Path=ModelOrder.Employee}"/>
+        <Label Content="Клієнт:" Grid.Row="1" Grid.Column="0" Margin="10" Background="Transparent" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+        <ComboBox x:Name="cbCustomer" DisplayMemberPath="Name" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" VerticalContentAlignment="Center"
+                  ItemsSource="{Binding Path=Customers}" SelectedItem="{Binding Path=ModelOrder.Customer}" />
+        <Label Content="Послуга:" Grid.Row="2" Grid.Column="0" Margin="10" Background="Transparent" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+        <ComboBox x:Name="cbService" DisplayMemberPath="Name" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" Background="Transparent" BorderBrush="Black" BorderThickness="2" VerticalContentAlignment="Center"
+                  ItemsSource="{Binding Path=Services}" SelectedItem="{Binding Path=ModelOrder.Service}"/>
+        <Label Content="Дата:" Grid.Row="3" Grid.Column="0" Margin="10" Background="Transparent" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+        <DatePicker x:Name="dpDate" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" SelectedDateFormat="Short" Background="Transparent" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" HorizontalContentAlignment="Right"
+                  SelectedDate="{Binding Path=ModelOrder.Date}"/>
+        <Label Content="Час:" Grid.Row="4" Grid.Column="0" Margin="10" Background="Transparent" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+        <xctk:TimePicker x:Name="tpStart" Grid.Row="4" Grid.Column="4" Margin="5" TimeInterval="00:30:00" Format="ShortTime" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                         Value="{Binding Path=SelectedStart}"/>
+        <Button x:Name="Ok" Content="OK" Template="{StaticResource ResourceKey=btmTemp}" Grid.Row="5" Grid.Column="2" Margin="10" Foreground="Green" FontWeight="Bold"  BorderBrush="Green" BorderThickness="2"/>
+        <Button x:Name="Cancel" Content="Cancel" Template="{StaticResource ResourceKey=btmTemp}" Grid.Row="5" Grid.Column="3" Margin="10,10,10,10" Foreground="Red" FontWeight="Bold"  BorderBrush="Red" BorderThickness="2"/>
     </Grid>
 </Window>
